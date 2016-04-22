@@ -41,7 +41,7 @@ public class SimpleGalaxyGfx
         int numRuns = 1;
         
         @Option(name="-numStarsInThou", usage="Number of stars in thousands."
-                + "Default 20k.")
+                + " Default 20k.")
         int numStarsInThou = 20;
         
         @Option(name="-numArms", usage="Number of arms of the galaxy."
@@ -54,7 +54,7 @@ public class SimpleGalaxyGfx
         
         
         @Option(name="-swirl", usage="Angular spread, in multiples of Pi."
-                + "Default random  -3 to -1 or +1 to +3. ")
+                + " Default random  -3 to -1 or +1 to +3. ")
         float swirlyAngularSpread = Float.MIN_VALUE;
         
         @Option(name="-armsWeight", usage="Low values keep stars close to disk,"
@@ -134,7 +134,7 @@ public class SimpleGalaxyGfx
         if (wasExcept || args.help)
         {
             
-            System.out.println("java -jar prettygalaxy.jar [options...]");
+            System.out.println("java -jar prettygalaxy.v1.jar [options...]");
             parser.printUsage(System.out);
             
             System.exit(args.help?0:1);
