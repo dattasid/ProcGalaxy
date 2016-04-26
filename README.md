@@ -10,7 +10,7 @@ Procedural Colorful Galaxies
 
 Double click the jar to get a random galaxy shown. (Window closes automatically after 20 seconds).
 
-To save images or control the generation process, you will have to get down to the comnmand line.
+To save images or control the generation process, you will have to get down to the command line.
 
 ```
 java -jar prettygalaxy.v1.jar [options...]
@@ -28,8 +28,8 @@ java -jar prettygalaxy.v1.jar [options...]
  -maxArms N        : Maximum number of randomly chosen arms. Minimum is always
                      2. If -numArms is specified, that value is always used.
                      Default 6.
- -swirl N          : Angular spread, in multiples of Pi.Default random  -3 to
-                     -1 or +1 to +3.
+ -swirl N          : Angular spread, in multiples of Pi. Default random  -3.0 to
+                     -1.0 or +1.0 to +3.0.
  -armsWeight N     : Low values keep stars close to disk, high values push them
                      out to the arms. Default .1 to .4.
  -armsThickness N  : Low values make thinner arms, high values make thicker
