@@ -275,7 +275,7 @@ public class NebulaStormGalaxyGfx
             if (x1 < 0 || y1 < 0 || x1 > W || y1 > H)
                 continue;
             
-            drawStar(g2, x1, y1, rad, hue, bright);
+            drawStar(g2, x1, y1, rad, hue, .9f, bright);
         }
         
         makeBorder(g2, W, H, rand);
@@ -319,9 +319,10 @@ public class NebulaStormGalaxyGfx
     // WARNING: This needs to be thread local for the code to be multithreaded
     private static Color[] gCol = new Color[]{null, new Color(0, true)};
     private static final float[] zeroOne = new float[]{0, 1};
-    private static void drawStar(Graphics2D g2, double x, double y, int rad, float hue, float bright)
+    public static void drawStar(Graphics2D g2, double x, double y, int rad, float hue,
+            float sat, float bright)
     {
-        int rgb = Color.HSBtoRGB(hue, .9f, bright);
+        int rgb = Color.HSBtoRGB(hue, sat, bright);
         gCol[0] = new Color(rgb);
         RadialGradientPaint p = new RadialGradientPaint((float)x, (float)y, rad, zeroOne, gCol);
         
