@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -264,6 +265,9 @@ public class NebulaStormGalaxyGfx
             
             float hue = (float) (hueStart + x * hueAlongArm/armlen + Math.abs(org_y) * hueThickArm/armlen/armThickness/*+ rand.nextFloat() * .3f*/);
             int rad = (int) (Math.abs(rand.nextGaussian()) * args.avgStarRad)+1;
+            if (i > args.numStarsInThou * 1000 *999/1000)
+                rad = (int) args.maxStarRad;
+            
             if (rad > args.maxStarRad)
                 rad = (int) args.maxStarRad;
             float bright = .6f;
@@ -278,8 +282,15 @@ public class NebulaStormGalaxyGfx
             drawStar(g2, x1, y1, rad, hue, .9f, bright);
         }
         
+//        CirclesBorderMaker bm = new CirclesBorderMaker(W, H, rand);
+//        BufferedImage bim = bm.make();
+//        
+//        g2.drawImage(bim, 0, 0, null);
+        
         makeBorder(g2, W, H, rand);
         
+        //SID_DEBUG
+        saveImage(im, "out/back");
         if (args.out == null)
         {
             showImage(im);
@@ -326,9 +337,10 @@ public class NebulaStormGalaxyGfx
         gCol[0] = new Color(rgb);
         RadialGradientPaint p = new RadialGradientPaint((float)x, (float)y, rad, zeroOne, gCol);
         
-//        g2.setColor(new Color(rgb));
+//        g2.setColor(new Color(rgb + 0x71000000, true));
         g2.setPaint(p);
         g2.fillOval(((int)x)-rad, ((int)y)-rad, 2*rad+1, 2*rad+1);
+//        g2.fillRect(((int)x)-rad, ((int)y)-rad, 2*rad+1, 2*rad+1);
     }
     
     public static void showImage(BufferedImage im)
@@ -349,48 +361,102 @@ public class NebulaStormGalaxyGfx
         
         System.exit(0);
     }
-    
     private static void makeBorder(Graphics2D g2, int w, int h, Random rand)
     {
-        int border = w/10;
+        g2 = (Graphics2D) g2.create();
+        int border = w/16;
+        
+        g2.setStroke(new BasicStroke(1.5f));
+        g2.setColor(Color.lightGray);
+        
+        g2.drawLine(border - 20, border, border+w*2/3, border);
+        g2.drawLine(border, border-20, border, border+h*2/3);
+        
+        g2.translate(w, h);
+        g2.scale(-1, -1);
+        
+        g2.drawLine(border - 20, border, border+w*2/3, border);
+        g2.drawLine(border, border-20, border, border+h*2/3);
+        
+        g2.dispose();
+    }
+    
+    private static void makeBorder_old(Graphics2D g2, int w, int h, Random rand)
+    {
+//        int border = w/10;
         int border1 = w/12;
 //        int diff = border - border1;
         LinearGradientPaint p = new LinearGradientPaint(0, 0, w, h, new float[]{0, 1},
                 new Color[]{
-                    new Color(Color.HSBtoRGB(rand.nextFloat(), 1, .9f)),
-                    new Color(Color.HSBtoRGB(rand.nextFloat(), 1, .9f))
+                    new Color(Color.HSBtoRGB(rand.nextFloat(), 1, .9f)
+                            +0x1f000000, true),
+                    new Color(Color.HSBtoRGB(rand.nextFloat(), 1, .9f)
+                            +0x1f000000, true)
         });
         g2.setPaint(p);
         
-        g2.setStroke(new BasicStroke(1));
+//        g2.setStroke(new BasicStroke(1));
+//        
+//        g2.drawRect(border, border, w-2*border, h-2*border);
         
-        g2.drawRect(border, border, w-2*border, h-2*border);
+        int BW = 3;
         
-        g2.setStroke(new BasicStroke(3));
+//        g2.setStroke(new BasicStroke(10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+        g2.setStroke(new BasicStroke(1.5f));
         
-        g2.drawRect(border1, border1, w-2*border1, h-2*border1);
+//        if (rand.nextBoolean())
+//        {
+//            g2.drawRect(border1, border1, w-2*border1, h-2*border1);
+//        }
+//        else
+//        {
+            int dx = w-2*border1;
+            int dy = h-2*border1;
+//            
+            int x1 = dx/4 + rand.nextInt(dx/2);
+            int y1 = dy/4 + rand.nextInt(dy/2);
+//            
+//            
+//            g2.drawLine(border1, border1, border1+x1, border1);
+//            g2.drawLine(border1, border1, border1, border1+y1);
+//            
+//            g2.drawLine(w-border1, h-border1, w-border1-x1, h-border1);
+//            g2.drawLine(w-border1, h-border1, w-border1, h-border1-y1);
+//        }
         
-        g2.setClip(border1, border1, w-2*border1, h-2*border1);
+        int px[] = {
+                border1, border1+x1, border1+x1-BW, border1 
+        },
+            py[] = {
+                border1, border1, border1+BW, border1+BW
+            };
         
-        int r = w/6;
-        makeCircles(g2, border+40, border+40, r, rand);
-        makeCircles(g2, border+r/2+rand.nextInt(r/2),
-                border+r/2+rand.nextInt(r/2), r/4, rand);
+        g2.fillPolygon(px, py, 4);
+
+        flipBorder(px, py, w, h);
+        g2.fillPolygon(px, py, 4);
+        
+        px = new int[]{
+                border1, border1, border1+BW, border1+BW 
+        };
+        py = new int[]{
+                border1, border1+y1, border1+y1-BW, border1
+            };
+        g2.fillPolygon(px, py, 4);
+
+        flipBorder(px, py, w, h);
+        g2.fillPolygon(px, py, 4);
+        
     }
 
-    private static void makeCircles(Graphics2D g2, int x, int y, int r,
-                                    Random rand)
+    private static void flipBorder(int[] px, int[] py, int w, int h)
     {
-        int n = 1+ rand.nextInt(4);
-        
-        for (int i = 0; i < n; i++)
-        {
-            g2.setStroke(new BasicStroke(1+rand.nextFloat() * 2));
-            g2.drawOval(x-r, y-r, 2*r, 2*r);
-            
-            r -= (10 + rand.nextInt(10));
-        }
+        for(int i = 0; i < px.length; i++)
+            px[i] = w - px[i];
+        for(int i = 0; i < py.length; i++)
+            py[i] = h - py[i];
     }
+
 
 
 }
