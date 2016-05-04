@@ -52,6 +52,11 @@ public class Spherize
         float planetFeatureSize = 2 + rand.nextFloat() * 5;
         float planetWaterLevel = .1f + rand.nextFloat() * .4f;
         
+        float sun_dir[] = {
+                rand.nextFloat(),rand.nextFloat(), rand.nextFloat(),  
+        };
+        norm_vec(sun_dir);
+        
         for (int x = 0; x < W; x++)
         {
             for (int y = 0; y < H; y++)
@@ -82,61 +87,72 @@ public class Spherize
                 else
                 {
                     // Shading.
-                    float nx = dx/r;
-                    float ny = dy/r;
+                    float nx = dx/RAD;
+                    float ny = dy/RAD;
+                    float nz = (float) Math.sqrt(1-nx*nx-ny*ny);
                     
+                    float bright = (nx*sun_dir[0]+ny*sun_dir[1]+nz*sun_dir[2]);
+                    bright = (float) ImprovedPerlin.fade(bright);
                     
-                    int surface_rgb = 0;
-                    double n = 0;
-                    
-                    for (int i = 0; i < OCTAVES; i++)
+                    if (bright > .1f)
                     {
-                        n += ImprovedPerlin.noise(x2*oct[i], y2*oct[i], .5)*fac[i];
-                    }
-                    
-                    if (n < planetWaterLevel)
-                        surface_rgb = 0xff0000af;
-                    else
-                    {
-//                        int c = 0x7f+(int) (0xff * n/MAXVAL/2);
-//                        c &= 0xff;
-//                        c *= 0x000100;
-//                        c += 0xff000000;
-
-//                        int c = blend(planetSurfaceColor1, planetSurfaceColor2,
-//                                (float)((n-planetWaterLevel)/(MAXVAL - planetWaterLevel)));
+                        int surface_rgb = 0;
+                        double n = 0;
                         
-                        surface_rgb = planetSurfaceColor1;
-                    }
-
-                    // clouds
-                    n = 0;
-                    for (int i = 0; i < OCTAVES; i++)
-                    {
-                        n +=
-                            ImprovedPerlin.noise(
-                                x2*oct[i] + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 3.5)*3
-                                , y2*oct[i]*(i==0?5:1) + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 4.5)*3
-                                , 1.5)*fac[i]
-                            ;
-                    }
-                    float cloud = 0;
-                    if (n >.1f)
-                        cloud = (float)Math.pow((n-.1)/(MAXVAL-.1), .1);
-                    
-                    if (cloud > 0)
-                        surface_rgb = blend(surface_rgb, planetAtmosColor, cloud);
-                    
-                    // atmosphere
-                    if (r_n > .9)
+                        for (int i = 0; i < OCTAVES; i++)
+                        {
+                            n += ImprovedPerlin.noise(x2*oct[i], y2*oct[i], .5)*fac[i];
+                        }
+                        
+                        if (n < planetWaterLevel)
+                            surface_rgb = 0xff0000af;
+                        else
+                        {
+    //                        int c = 0x7f+(int) (0xff * n/MAXVAL/2);
+    //                        c &= 0xff;
+    //                        c *= 0x000100;
+    //                        c += 0xff000000;
+    
+    //                        int c = blend(planetSurfaceColor1, planetSurfaceColor2,
+    //                                (float)((n-planetWaterLevel)/(MAXVAL - planetWaterLevel)));
+                            
+                            surface_rgb = planetSurfaceColor1;
+                        }
+    
+                        // clouds
+                        n = 0;
+                        for (int i = 0; i < OCTAVES; i++)
+                        {
+                            n +=
+                                ImprovedPerlin.noise(
+                                    x2*oct[i] + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 3.5)*3
+                                    , y2*oct[i]*(i==0?5:1) + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 4.5)*3
+                                    , 1.5)*fac[i]
+                                ;
+                        }
+                        float cloud = 0;
+                        if (n >.1f)
+                            cloud = (float)Math.pow((n-.1)/(MAXVAL-.1), .1);
+                        
+                        if (cloud > 0)
+                            surface_rgb = blend(surface_rgb, planetAtmosColor, cloud);
+                        
+                        // atmosphere
+                        if (r_n > .9)
+                            surface_rgb =  
+                                    blend(planetAtmosColor, surface_rgb,
+    //                                        (1-r_n)/.1f
+                                            (float)Math.pow((1-r_n)/.1f, .5)
+                                            );
+                        
                         surface_rgb =  
-                                blend(planetAtmosColor, surface_rgb,
-//                                        (1-r_n)/.1f
-                                        (float)Math.pow((1-r_n)/.1f, .5)
+                                blend(0xff000000, surface_rgb,
+                                        bright
                                         );
-                    
-                    im.setRGB(x, y, surface_rgb);
-
+                        im.setRGB(x, y, surface_rgb);
+                    }
+                    else
+                        im.setRGB(x, y, 0xff000000);
                 }
                 
             }
@@ -150,6 +166,14 @@ public class Spherize
         
     }
     
+    private static void norm_vec(float[] v)
+    {
+        float r = (float) Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+        v[0] /= r;
+        v[1] /= r;
+        v[2] /= r;
+    }
+
     public static int blend( int c1, int c2, float ratio ) {
         if ( ratio > 1f ) ratio = 1f;
         else if ( ratio < 0f ) ratio = 0f;
