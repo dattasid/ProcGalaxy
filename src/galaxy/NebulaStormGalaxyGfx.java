@@ -354,7 +354,7 @@ public class NebulaStormGalaxyGfx
         
         try
         {
-            Thread.sleep(20 * 1000);
+            Thread.sleep(5 * 1000);
         } catch (InterruptedException e)
         {
         }

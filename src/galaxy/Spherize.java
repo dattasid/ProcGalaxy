@@ -124,15 +124,16 @@ public class Spherize
                         for (int i = 0; i < OCTAVES; i++)
                         {
                             n +=
+                            Math.abs(
                                 ImprovedPerlin.noise(
-                                    x2*oct[i] + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 3.5)*3
-                                    , y2*oct[i]*(i==0?5:1) + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 4.5)*3
+                                    x2*oct[i] + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 3.5)*1
+                                    , y2*oct[i]*(i==0?3:1) + ImprovedPerlin.noise(x2*oct[i], y2*oct[i], 4.5)*1//3
                                     , 1.5)*fac[i]
-                                ;
+                                );
                         }
                         float cloud = 0;
-                        if (n >.1f)
-                            cloud = (float)Math.pow((n-.1)/(MAXVAL-.1), .1);
+                        if (n >.5f)
+                            cloud = (float)Math.pow((n-.5)/(MAXVAL-.5), .1);
                         
                         if (cloud > 0)
                             surface_rgb = blend(surface_rgb, planetAtmosColor, cloud);
