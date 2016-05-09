@@ -43,7 +43,7 @@ public class HabitPlanet extends Planet
                 Color.HSBtoRGB(hue1+.5f, rand.nextFloat() * .2f + .3f,
                         1 - bright1);
         
-        planetFeatureSize = 1 + rand.nextFloat() * 6;
+        planetFeatureSize = .4f + rand.nextFloat() * 6;
         planetWaterLevel = .1f + rand.nextFloat() * .4f;
         
         sun_dir = new float[]{
@@ -51,7 +51,7 @@ public class HabitPlanet extends Planet
         };
         norm_vec(sun_dir);
         
-        clouds = true;//rand.nextBoolean();
+        clouds = rand.nextInt(10)<7;
     
         tiltx = .6 + rand.nextDouble()*.4;
         tiltx *= rand.nextBoolean()?-1:1;
@@ -182,7 +182,7 @@ public class HabitPlanet extends Planet
                                                 + ImprovedPerlin.noise(tx*oct[i]*cloud_swirly_scale, ty*oct[i]*cloud_swirly_scale, 3.5)*cloud_swirlyness
                                         , ty*oct[i]*(i==0?cloud_stretch:1) * cloudFeatureRelativeSize 
                                                 + ImprovedPerlin.noise(tx*oct[i]*cloud_swirly_scale, ty*oct[i]*cloud_swirly_scale, 4.5)*cloud_swirlyness
-                                        , 1.5)*fac[i]
+                                        , 12.34)*fac[i]
                                     ;
                             }
                             float cloud = 0;
