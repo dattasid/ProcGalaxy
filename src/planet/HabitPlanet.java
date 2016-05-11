@@ -20,7 +20,6 @@ public class HabitPlanet extends Planet
     float planetWaterLevel;
     
     boolean clouds;
-    Random rand;
     double tiltx, tilty;
     double cloud_stretch;
     double cloud_amount_min;
@@ -29,7 +28,7 @@ public class HabitPlanet extends Planet
     double cloud_swirlyness;
     public HabitPlanet(long seed)
     {
-        rand = new Random(seed);
+        super(seed);
         planetAtmosColor = 
                 Color.HSBtoRGB(rand.nextFloat(), rand.nextFloat() * .2f + .7f, .9f)
                 ;
@@ -45,11 +44,6 @@ public class HabitPlanet extends Planet
         
         planetFeatureSize = .4f + rand.nextFloat() * 6;
         planetWaterLevel = .1f + rand.nextFloat() * .4f;
-        
-        sun_dir = new float[]{
-                rand.nextFloat(),rand.nextFloat(), rand.nextFloat(),  
-        };
-        norm_vec(sun_dir);
         
         clouds = rand.nextInt(10)<7;
     
@@ -132,8 +126,6 @@ public class HabitPlanet extends Planet
                     float bright = (nx*sun_dir[0]+ny*sun_dir[1]+nz*sun_dir[2]);
                     bright = (float) ImprovedPerlin.fade(bright);
 
-                    //SID_DEBUG
-                    bright = 1;
                     if (bright > .05f)
                     {
                         int surface_rgb = 0;

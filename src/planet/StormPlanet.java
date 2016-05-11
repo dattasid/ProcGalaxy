@@ -1,7 +1,9 @@
 package planet;
 
 import galaxy.ImprovedPerlin;
+import util.ColorGrad;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
@@ -10,7 +12,42 @@ import java.util.Random;
 public class StormPlanet extends Planet
 {
 
-    Random rand = new Random();
+    int OCTAVES = 5;
+    ColorGrad cg;
+    
+    double stormFeatureFreq;
+    
+    double tiltx, tilty;
+    public StormPlanet(long seed)
+    {
+        super(seed);
+        int NUMBANDS = 3 + rand.nextInt(15);
+        
+        int[] colors = new int[NUMBANDS];
+        float[] pts = new float[NUMBANDS];
+        // TODO : Choose a color scheme
+        for (int i = 0; i < NUMBANDS; i++)
+        {
+            colors[i] = Color.HSBtoRGB(
+              rand.nextFloat(),
+              .2f + rand.nextFloat() * .4f,
+              .2f + rand.nextFloat() * .8f
+            );
+            
+            if (i == 0)
+                pts[i] = 0;
+            else
+                pts[i] = pts[i - 1] + 1; //.5f + .5f * rand.nextFloat();
+        }
+        
+        cg = new ColorGrad(colors, pts);
+        
+        stormFeatureFreq = 5 + rand.nextFloat() * 10;
+        
+        double tiltAngle = Math.PI*((2* rand.nextFloat() - 1) /6);
+        tiltx = Math.cos(tiltAngle);
+        tilty = Math.sin(tiltAngle);
+    }
     
     @Override
     public BufferedImage render(int SIZE)
@@ -26,7 +63,17 @@ public class StormPlanet extends Planet
         final int RAD = SIZE/2;
         
         double offx = rand.nextDouble() * 256, offy = rand.nextDouble() * 256;  
-
+        int oct[] = new int[OCTAVES];
+        double fac[] = new double[OCTAVES];
+        oct[0] = 1; fac[0] = 1;
+        double MAXVAL = 1.01; 
+        for (int i = 1; i < OCTAVES; i++)
+        {
+            oct[i] = oct[i-1]*2;
+            fac[i] = fac[i-1]*.5;
+        
+            MAXVAL += fac[i];
+        }
         
         for (int x = 0; x < SIZE; x++)
         {
@@ -49,62 +96,46 @@ public class StormPlanet extends Planet
 //                    im.setRGB(x, y, 0);
                     continue;
                 }
-                double x2 = r1 * dx/r+cx;
-                double y2 = r1 * dy/r+cy;
+                double x2 = r1 * dx/r;
+                double y2 = r1 * dy/r;
                 
-                // Tilt dont matter
-                x2 = x2*planetFeatureSize/RAD+offx;
-                y2 = y2*planetFeatureSize/RAD+offy;
+                x2 /= RAD;
+                y2 /= RAD;
                 
-                if (r > RAD)
-                    im.setRGB(x, y, 0xff000000);
-                else
-                {
-                    // Shading.
-                    float nx = dx/RAD;
-                    float ny = dy/RAD;
-                    float nz = (float) Math.sqrt(1-nx*nx-ny*ny);
-                    
-                    float bright = (nx*sun_dir[0]+ny*sun_dir[1]+nz*sun_dir[2]);
-//                    bright = (float) ImprovedPerlin.fade(bright);
-                    bright = (float) Math.pow(bright, 10);
-                    
-                    int surface_rgb = 0xff000000;
-                    double n_lava = 0, n_sur = 0;
-                    
-                    for (int i = 0; i < OCTAVES; i++)
-                    {
-                        double val = ImprovedPerlin.noise(x2*oct[i], y2*oct[i], .5);
-                        n_lava += (1 - Math.abs(val)) * fac[i];
-                    }
+                float z2 = (float) Math.sqrt(1-x2*x2-y2*y2);
+              
+                float bright = (float)(x2*sun_dir[0]+y2*sun_dir[1]+z2*sun_dir[2]);
 
-                    for (int i = 0; i < OCTAVES; i++)
-                    {
-                        double val = ImprovedPerlin.noise(
-                                x2*oct[i]*50, y2*oct[i]*50, .5);
-                        n_sur += val * fac[i];
-                    }
-                    
-                    n_lava /= MAXVAL;
-                    n_sur /= MAXVAL;
-                    n_sur = (n_sur + 1)/2;
-                    n_sur = Math.pow(n_sur, 2);
-                    
-                    
-                    surface_rgb = blend(0xff000000, 0xffff0000,
-                                (float)(Math.pow(n_lava, 10)));
-                    if (bright > .1f)
-                    {
-                        surface_rgb =
-                                blendAdd(surface_rgb,
-                                blend(0xff000000, 0xffffafaf,
-                                (float)(bright*n_sur))
-                                );
-                    }
-//                    surface_rgb = blend(0xff000000, 0xff00ff00, (float)n);
-                    im.setRGB(x, y, surface_rgb);
-                }
+                if (bright > 0)
+                    bright = (float) ImprovedPerlin.fade(bright);
+    //              bright = (float) Math.pow(bright, 10);
                 
+              if (bright > 0f)
+              {
+                  // Tilt dont matter for the noise part
+                  double nx = x2*stormFeatureFreq+offx;
+                  double ny = y2*stormFeatureFreq+offy;
+                  
+                double n_sur = 0;
+                
+                for (int i = 0; i < OCTAVES; i++)
+                {
+                    double val = ImprovedPerlin.noise(nx*oct[i], ny*oct[i], .5);
+                    n_sur += val * fac[i];
+                }
+
+                double tiltedy = x2 * tilty + y2 * tiltx;
+                tiltedy += n_sur * .05f;
+                  
+                im.setRGB(x, y,
+                          blend(0xff000000, cg.get((float)((tiltedy) / 2 + .5f)),
+                                  bright));
+              }
+              else
+              {
+                  im.setRGB(x, y, 0xff000000);
+              }
+              
             }
         }
         

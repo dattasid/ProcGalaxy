@@ -1,14 +1,25 @@
 package planet;
 
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 public abstract class Planet
 {
+    Random rand;
     float sun_dir[];
 
     public abstract BufferedImage render(int SIZE);
 
-    
+    protected Planet(long seed)
+    {
+        rand = new Random(seed);
+        
+        
+        sun_dir = new float[]{
+                rand.nextFloat(),rand.nextFloat(), rand.nextFloat(),  
+        };
+        norm_vec(sun_dir);
+    }
 
     public void setSunDir(float x, float y, float z)
     {

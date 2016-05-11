@@ -1,24 +1,24 @@
 package planet;
 
-import galaxy.NebulaStormGalaxyGfx;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import galaxy.NebulaStormGalaxyGfx;
+
 public class PlanetsGfx
 {
 
-    public static void main(String[] args)
+    public static void main2(String[] args)
     {
-        BufferedImage im = new HabitPlanet(System.currentTimeMillis()).render(400);
+        BufferedImage im = new StormPlanet(System.currentTimeMillis()).render(400);
 //        Graphics2D g2 = im.createGraphics();
 //        g2.setColor(Color.green);
 //        g2.fillRect(0, 0, 400, 400);
         NebulaStormGalaxyGfx.showImage(im);
     }
-    public static void main2(String[] args)
+    public static void main(String[] args)
     {
         final int H = 800, W = H*3/4;
 
@@ -33,43 +33,69 @@ public class PlanetsGfx
         
         drawStars(g2, rand, W, H);
         
-        
         float[] sun_dir = { rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
         Planet.norm_vec(sun_dir);
         
-        switch (rand.nextInt(2))
+        long seed;
+        
+        makePlanet(g2, W, H, 400, W/2-200, H/2-200, rand, sun_dir);
+        
+        int N = rand.nextInt(5);
+        for (int i = 0; i < N; i++)
         {
-        case 0:
-            p = new HabitPlanet(System.currentTimeMillis());
-            break;
-        case 1:
-            p = new LavaPlanet(System.currentTimeMillis());
-            break;
+            int dia = rand.nextInt(100) + 50;
+            
+            int x = rand.nextInt(W/2 *3/4) + W/2/4;
+            int y = rand.nextInt(H/2 *3/4) + H/2/4;
+            
+            makePlanet(g2, W, H, dia, x, y, rand, sun_dir);
         }
         
-        p.setSunDir(sun_dir[0],  sun_dir[1], sun_dir[2]);
-        
-        BufferedImage pim = p.render(400);
-        
-        g2.drawImage(pim, W/2-200, H/2-200, null);
-        
-        
-        switch (rand.nextInt(2))
-        {
-        case 0:
-            p = new HabitPlanet(System.currentTimeMillis());
-            break;
-        case 1:
-            p = new LavaPlanet(System.currentTimeMillis());
-            break;
-        }
-        
-        p.setSunDir(sun_dir[0],  sun_dir[1], sun_dir[2]);
-        pim = p.render(200);
-        
-        g2.drawImage(pim, W/2-200, H/2-200, null);
+//        seed = System.currentTimeMillis();
+//        switch (rand.nextInt(3))
+//        {
+//        case 0:
+//            p = new HabitPlanet(seed);
+//            break;
+//        case 1:
+//            p = new LavaPlanet(seed);
+//            break;
+//        case 2:
+//            p = new StormPlanet(seed);
+//            break;
+//        }
+//        
+//        p.setSunDir(sun_dir[0],  sun_dir[1], sun_dir[2]);
+//        pim = p.render(200);
+//        
+//        g2.drawImage(pim, W/2-200, H/2-200, null);
         
         NebulaStormGalaxyGfx.showImage(im);
+    }
+    private static Planet makePlanet(Graphics2D g2, final int W, final int H,
+            int diameter, int x, int y, Random rand, float[] sun_dir)
+    {
+        Planet p = null;
+        long seed = rand.nextLong();
+        switch (rand.nextInt(3))
+        {
+        case 0:
+            p = new HabitPlanet(seed);
+            break;
+        case 1:
+            p = new LavaPlanet(seed);
+            break;
+        case 2:
+            p = new StormPlanet(seed);
+            break;
+        }
+        
+        p.setSunDir(sun_dir[0],  sun_dir[1], sun_dir[2]);
+        
+        BufferedImage pim = p.render(diameter);
+        
+        g2.drawImage(pim, x, y, null);
+        return p;
     }
 
     private static void drawStars(Graphics2D g2, Random rand, int w, int h)

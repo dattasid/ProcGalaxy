@@ -15,15 +15,13 @@ public class LavaPlanet extends Planet
     float planetFeatureSize;
     float planetWaterLevel;
     
-    Random rand;
-    
     int oct[] = new int[OCTAVES];
     double fac[] = new double[OCTAVES];
     double MAXVAL = 1.01; 
 
     public LavaPlanet(long seed)
     {
-        rand = new Random(seed);
+        super(seed);
         
         planetFeatureSize = 2 + rand.nextFloat() * 30;
         
