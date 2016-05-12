@@ -45,8 +45,8 @@ public class PlanetsGfx
         {
             int dia = rand.nextInt(100) + 50;
             
-            int x = rand.nextInt(W/2 *3/4) + W/2/4;
-            int y = rand.nextInt(H/2 *3/4) + H/2/4;
+            int x = rand.nextInt(W *3/4) + W/2/4;
+            int y = rand.nextInt(H *3/4) + H/2/4;
             
             makePlanet(g2, W, H, dia, x, y, rand, sun_dir);
         }
@@ -77,15 +77,17 @@ public class PlanetsGfx
     {
         Planet p = null;
         long seed = rand.nextLong();
-        switch (rand.nextInt(3))
+        switch (rand.nextInt(5))
         {
         case 0:
+        case 1:
             p = new HabitPlanet(seed);
             break;
-        case 1:
+        case 2:
             p = new LavaPlanet(seed);
             break;
-        case 2:
+        case 3:
+        case 4:
             p = new StormPlanet(seed);
             break;
         }

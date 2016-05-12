@@ -47,7 +47,7 @@ public class HabitPlanet extends Planet
         
         clouds = rand.nextInt(10)<7;
     
-        tiltx = .6 + rand.nextDouble()*.4;
+        tiltx = .7 + rand.nextDouble()*.3;
         tiltx *= rand.nextBoolean()?-1:1;
         tilty = Math.sqrt(1-tiltx*tiltx);
         
