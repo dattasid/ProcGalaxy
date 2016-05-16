@@ -18,7 +18,16 @@ public class PlanetsGfx
 //        g2.fillRect(0, 0, 400, 400);
         NebulaStormGalaxyGfx.showImage(im);
     }
+    
     public static void main(String[] args)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            BufferedImage im = generate();
+            NebulaStormGalaxyGfx.saveImage(im, "out/planets");
+        }
+    }
+    public static BufferedImage generate()
     {
         final int H = 800, W = H*3/4;
 
@@ -50,27 +59,10 @@ public class PlanetsGfx
             
             makePlanet(g2, W, H, dia, x, y, rand, sun_dir);
         }
+
+        return im;
         
-//        seed = System.currentTimeMillis();
-//        switch (rand.nextInt(3))
-//        {
-//        case 0:
-//            p = new HabitPlanet(seed);
-//            break;
-//        case 1:
-//            p = new LavaPlanet(seed);
-//            break;
-//        case 2:
-//            p = new StormPlanet(seed);
-//            break;
-//        }
-//        
-//        p.setSunDir(sun_dir[0],  sun_dir[1], sun_dir[2]);
-//        pim = p.render(200);
-//        
-//        g2.drawImage(pim, W/2-200, H/2-200, null);
-        
-        NebulaStormGalaxyGfx.showImage(im);
+//        NebulaStormGalaxyGfx.showImage(im);
     }
     private static Planet makePlanet(Graphics2D g2, final int W, final int H,
             int diameter, int x, int y, Random rand, float[] sun_dir)
