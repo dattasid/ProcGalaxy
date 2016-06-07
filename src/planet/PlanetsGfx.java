@@ -6,31 +6,89 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+import org.kohsuke.args4j.ParserProperties;
+
 import galaxy.NebulaStormGalaxyGfx;
 
 public class PlanetsGfx
 {
 
-    public static void main(String[] args)
+    static class Args
     {
-        BufferedImage im = generate(); //new StormPlanet(System.currentTimeMillis()).render(400);
-//        Graphics2D g2 = im.createGraphics();
-//        g2.setColor(Color.green);
-//        g2.fillRect(0, 0, 400, 400);
-        NebulaStormGalaxyGfx.showImage(im);
+        @Option(name="-imageSize", usage="Output image size."
+                + " Images are always square. Default is 800x800.")
+        int imageSize = 800;
+        
+        @Option(name="-out", metaVar="dir/prefix",
+                usage="Output file. Finds the first unused file dir/prefixN and"
+                    + " writes to it. Can write -numRuns number of files"
+                    + " incrementally numbered. Directory must be provided and"
+                    + " must already exist.\n"
+                    + " If absent, shows one image and exits.")
+        String out = null;
+        
+        @Option(name="-numRuns", usage="Produce how many images."
+                + " Without an -out option, shows 1 image and quits.")
+        int numRuns = 1;
+        
+        @Option(name="--help", help=true, aliases={"-h", "-?", "/h", "/?"})
+        boolean help;
+    }
+    public static void main(String[] argv)
+    {
+        Args args = new Args();
+        CmdLineParser parser = new CmdLineParser(args,
+                ParserProperties.defaults().withOptionSorter(null)
+                    .withUsageWidth(80).withShowDefaults(false));
+        
+        boolean wasExcept = false;
+        try {
+            parser.parseArgument(argv);
+        }
+        catch (CmdLineException e)
+        {
+            System.out.println(e.getMessage());
+            wasExcept = true;
+        }
+
+        if (wasExcept || args.help)
+        {
+            
+            System.out.println("java -jar PlanetGfx.v1.jar [options...]");
+            parser.printUsage(System.out);
+            
+            System.exit(args.help?0:1);
+        }
+        
+        for (int i = 0; i < args.numRuns; i++)
+        {
+            BufferedImage im = generate(args);
+
+            if (args.out == null)
+            {
+                NebulaStormGalaxyGfx.showImage(im);
+            } else
+            {
+                NebulaStormGalaxyGfx.saveImage(im, args.out);
+            }
+        }
+//        NebulaStormGalaxyGfx.showImage(im);
     }
     
-    public static void main2(String[] args)
+//    public static void main2(String[] args)
+//    {
+//        for (int i = 0; i < 2; i++)
+//        {
+//            BufferedImage im = generate();
+//            NebulaStormGalaxyGfx.saveImage(im, "out/planets");
+//        }
+//    }
+    public static BufferedImage generate(Args args)
     {
-        for (int i = 0; i < 2; i++)
-        {
-            BufferedImage im = generate();
-            NebulaStormGalaxyGfx.saveImage(im, "out/planets");
-        }
-    }
-    public static BufferedImage generate()
-    {
-        final int H = 800, W = H*3/4;
+        final int H = args.imageSize, W = H*3/4;
 
         BufferedImage im = new BufferedImage(W, H, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = im.createGraphics();
