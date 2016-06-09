@@ -103,9 +103,27 @@ public class PlanetsGfx
         float[] sun_dir = { rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
         Planet.norm_vec(sun_dir);
         
+        // line
+//        sun_dir = new float[]{1, 0, .2f};
+//        int r = 100;
+//        int x1 = W - r;
+//        int dx1 = 150;
+//        for (int i = 0; i < 5; i++)
+//        {
+//            makePlanet(g2, W, H, r, x1, H/2-r/2, rand, sun_dir);
+//            r = (int) (r*1.55);
+//            x1 -= dx1;
+//            dx1 += 60;
+//        }
+        
+        // grid
+        sun_dir = new float[]{0, 0, 1f};
+        for (int x = 0; x < W; x+=W/5)
+            for (int y = 0; y < H; y+=H/5)
+                makePlanet(g2, W, H, Math.min(W/5-10, H/5-10), x, y, rand, sun_dir);
         
 //        makePlanet(g2, W, H, 400, W/2-200, H/2-200, rand, sun_dir);
-        makePlanetRecur(g2, W, H, 400, W/2-200, H/2-200, rand, sun_dir, 0);
+//        makePlanetRecur(g2, W, H, 400, W/2-200, H/2-200, rand, sun_dir, 0);
         
 //        int N = rand.nextInt(5);
 //        for (int i = 0; i < N; i++)
