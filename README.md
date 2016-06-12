@@ -6,6 +6,8 @@ Procedural Colorful Galaxies
 <img src="examples/many_star0.png" width="400">
 <img src="examples/lg_star8.png" width="400">
 
+[<img src="examples/habit_single6.png" width="100"> Procedural Planets see below](#procplanets)
+
 [Download here!](https://github.com/dattasid/ProcGalaxy/raw/master/binaries/prettygalaxy.v1.jar)
 
 Double click the jar to get a random galaxy shown. (Window closes automatically after 20 seconds).
@@ -51,3 +53,44 @@ This is how it looks before the swirl:
 
 <img src="examples/noswirl1.png" width="200">
 <img src="examples/noswirl0.png" width="200">
+
+
+#procplanets
+
+<img src="examples/habit_single15.png" width="400">
+<img src="examples/habit_single3.png" width="400">
+<img src="examples/storm_single2.png" width="400">
+<img src="examples/storm_single3.png" width="400">
+<img src="examples/lava_single4.png" width="400">
+
+[Download here!](https://github.com/dattasid/ProcGalaxy/raw/master/binaries/PlanetGfx.v1.jar)
+
+Procedural planets. Currently three types are implemented.
+
++ Habitable planets with landmasses, water oceans and cloud cover.
++ Gas  (Storm) planets.
++ Cracked (lava) planets with glowing magma visible even on the dark side.
+ 
+```
+java -jar PlanetGfx.v1.jar [options...]
+ -imageSize N    : Output image size. Images are always square. Default is
+                   800x800.
+ -out dir/prefix : Output file. Finds the first unused file dir/prefixN and
+                   writes to it. Can write -numRuns number of files
+                   incrementally numbered. Directory must be provided and must
+                   already exist.
+                    If absent, shows one image and exits.
+ -numRuns N      : Produce how many images. Without an -out option, shows 1
+                   image and quits.
+ -types VAL      : What types of planet. Comma separated list of types. valid
+                   values are lava, habitable and storm.
+                   Example: --types lava,habitable
+ -layout VAL     : single, grid or line. Single just creates one planet, grid
+                   creates a 5x5 grid of randomly picked planets. Line creates
+                   planets in a line for showcasing.
+ -clearback      : Transparent background, so it is easy to compose into other
+                   images
+```
+
+Example: ```java -jar PlanetGfx.v1.jar -numRuns 1 -types habitable,storm -out out/lgim -layout single```
+
