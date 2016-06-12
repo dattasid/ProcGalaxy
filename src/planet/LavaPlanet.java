@@ -125,7 +125,7 @@ public class LavaPlanet extends Planet
                     
                     surface_rgb = blend(0xff000000, 0xffef0000,
                                 (float)(Math.pow(n_lava, 20)));
-                    if (bright > .1f)
+                    if (bright > 0f)
                     {
                         surface_rgb =
                                 blendAdd(surface_rgb,

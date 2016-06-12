@@ -47,7 +47,7 @@ public class PlanetsGfx
         @Option(name="-layout", usage="single, grid or line. Single just creates one planet, "
                 + "grid creates a 5x5 grid of randomly picked planets. Line creates planets in a"
                 + " line for showcasing.")
-        String layout="grid";
+        String layout="single";
         
         @Option(name="-clearback", usage="Transparent background, so it is easy to compose into other images")
         boolean clearBack = false;
@@ -178,7 +178,7 @@ public class PlanetsGfx
         float[] sun_dir = { rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
         Planet.norm_vec(sun_dir);
         
-        PlanetType pt = pickPlanet(args, rand);
+//        PlanetType pt = pickPlanet(args, rand);
         
         switch(args.layout)
         {
@@ -190,7 +190,7 @@ public class PlanetsGfx
             int dx1 = 150;
             for (int i = 0; i < 5; i++)
             {
-                makePlanet(g2, W, H, r, x1, H/2-r/2, rand, sun_dir, pt);
+                makePlanet(g2, W, H, r, x1, H/2-r/2, rand, sun_dir, pickPlanet(args, rand));
                 r = (int) (r*1.55);
                 x1 -= dx1;
                 dx1 += 60;
@@ -203,12 +203,12 @@ public class PlanetsGfx
             Planet.norm_vec(sun_dir);
             for (int x = 0; x < W; x+=W/5)
                 for (int y = 0; y < H; y+=H/5)
-                    makePlanet(g2, W, H, Math.min(W/5-10, H/5-10), x, y, rand, sun_dir, pt);
+                    makePlanet(g2, W, H, Math.min(W/5-10, H/5-10), x, y, rand, sun_dir, pickPlanet(args, rand));
             break;
         case "single":
             sun_dir = new float[]{rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
             Planet.norm_vec(sun_dir);
-            makePlanet(g2, W, H, W-20, 10, 10, rand, sun_dir, pt);
+            makePlanet(g2, W, H, W-20, 10, 10, rand, sun_dir, pickPlanet(args, rand));
             break;
         }
 //        makePlanet(g2, W, H, 400, W/2-200, H/2-200, rand, sun_dir);

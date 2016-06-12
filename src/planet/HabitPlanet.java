@@ -126,7 +126,7 @@ public class HabitPlanet extends Planet
                     float bright = (nx*sun_dir[0]+ny*sun_dir[1]+nz*sun_dir[2]);
                     bright = (float) ImprovedPerlin.fade(bright);
 
-                    if (bright > .05f)
+                    if (bright > 0/*.05f*/)
                     {
                         int surface_rgb = 0;
                         double n = 0;
