@@ -16,6 +16,10 @@ import galaxy.NebulaStormGalaxyGfx;
 public class PlanetsGfx
 {
 
+    static enum PlanetType
+    {
+        LAVA, HABIT, STORM;
+    }
     static class Args
     {
         @Option(name="-imageSize", usage="Output image size."
@@ -34,9 +38,73 @@ public class PlanetsGfx
                 + " Without an -out option, shows 1 image and quits.")
         int numRuns = 1;
         
+        @Option(name="-types", usage="What types of planet. Comma separated list of types. valid values are lava, habitable and storm.\n"
+                + "Example: --types lava,habitable")
+        String types = null;
+        
+       ArrayList<PlanetType> pTypes = new ArrayList<>();
+        
+        @Option(name="-layout", usage="single, grid or line. Single just creates one planet, "
+                + "grid creates a 5x5 grid of randomly picked planets. Line creates planets in a"
+                + " line for showcasing.")
+        String layout="grid";
+        
+        @Option(name="-clearback", usage="Transparent background, so it is easy to compose into other images")
+        boolean clearBack = false;
+        
         @Option(name="--help", help=true, aliases={"-h", "-?", "/h", "/?"})
         boolean help;
+        
+        
     }
+    
+    private static void validateArgs(Args args) throws CmdLineException
+    {
+        if (args.imageSize <= 0)
+            args.imageSize = 100;
+        
+        if (args.types == null)
+        {
+            args.pTypes.add(PlanetType.LAVA);
+            args.pTypes.add(PlanetType.HABIT);
+            args.pTypes.add(PlanetType.STORM);
+            
+        }
+        else
+        {
+            String[] t = args.types.split(",");
+            for (String t1 : t)
+            {
+                switch(t1)
+                {
+                case "lava":
+                    args.pTypes.add(PlanetType.LAVA);
+                    break;
+                case "habitable":
+                    args.pTypes.add(PlanetType.HABIT);
+                    break;
+                case "storm":
+                    args.pTypes.add(PlanetType.STORM);
+                    break;
+                default:
+                    throw new CmdLineException("No such planet type: "+t1);    
+                }
+            }
+
+        }
+        
+        switch(args.layout)
+        {
+        case "single":
+        case "grid":
+        case "line":
+            break;
+        default:
+            throw new CmdLineException("No such layout type: "+args.layout);
+        }
+    }
+
+    
     public static void main(String[] argv)
     {
         Args args = new Args();
@@ -47,6 +115,7 @@ public class PlanetsGfx
         boolean wasExcept = false;
         try {
             parser.parseArgument(argv);
+            validateArgs(args);
         }
         catch (CmdLineException e)
         {
@@ -54,6 +123,8 @@ public class PlanetsGfx
             wasExcept = true;
         }
 
+        
+        
         if (wasExcept || args.help)
         {
             
@@ -78,6 +149,7 @@ public class PlanetsGfx
 //        NebulaStormGalaxyGfx.showImage(im);
     }
     
+
 //    public static void main2(String[] args)
 //    {
 //        for (int i = 0; i < 2; i++)
@@ -88,40 +160,57 @@ public class PlanetsGfx
 //    }
     public static BufferedImage generate(Args args)
     {
-        final int H = args.imageSize, W = H*3/4;
+        final int H = args.imageSize, W = H;//*3/4;
 
         BufferedImage im = new BufferedImage(W, H, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = im.createGraphics();
         
         Random rand = new Random();
         
-        g2.setColor(Color.black);
-        g2.fillRect(0, 0, W, H);
-        
-        drawStars(g2, rand, W, H);
+        if (!args.clearBack)
+        {
+            g2.setColor(Color.black);
+            g2.fillRect(0, 0, W, H);
+            
+            drawStars(g2, rand, W, H);
+        }
         
         float[] sun_dir = { rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
         Planet.norm_vec(sun_dir);
         
-        // line
-//        sun_dir = new float[]{1, 0, .2f};
-//        int r = 100;
-//        int x1 = W - r;
-//        int dx1 = 150;
-//        for (int i = 0; i < 5; i++)
-//        {
-//            makePlanet(g2, W, H, r, x1, H/2-r/2, rand, sun_dir);
-//            r = (int) (r*1.55);
-//            x1 -= dx1;
-//            dx1 += 60;
-//        }
+        PlanetType pt = pickPlanet(args, rand);
         
-        // grid
-        sun_dir = new float[]{0, 0, 1f};
-        for (int x = 0; x < W; x+=W/5)
-            for (int y = 0; y < H; y+=H/5)
-                makePlanet(g2, W, H, Math.min(W/5-10, H/5-10), x, y, rand, sun_dir);
-        
+        switch(args.layout)
+        {
+        case "line":
+            // line
+            sun_dir = new float[]{1, 0, .2f};
+            int r = 100;
+            int x1 = W - r;
+            int dx1 = 150;
+            for (int i = 0; i < 5; i++)
+            {
+                makePlanet(g2, W, H, r, x1, H/2-r/2, rand, sun_dir, pt);
+                r = (int) (r*1.55);
+                x1 -= dx1;
+                dx1 += 60;
+            }
+            break;
+        case "grid":
+            // grid
+//            sun_dir = new float[]{0, 0, 1f};
+            sun_dir = new float[]{rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
+            Planet.norm_vec(sun_dir);
+            for (int x = 0; x < W; x+=W/5)
+                for (int y = 0; y < H; y+=H/5)
+                    makePlanet(g2, W, H, Math.min(W/5-10, H/5-10), x, y, rand, sun_dir, pt);
+            break;
+        case "single":
+            sun_dir = new float[]{rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
+            Planet.norm_vec(sun_dir);
+            makePlanet(g2, W, H, W-20, 10, 10, rand, sun_dir, pt);
+            break;
+        }
 //        makePlanet(g2, W, H, 400, W/2-200, H/2-200, rand, sun_dir);
 //        makePlanetRecur(g2, W, H, 400, W/2-200, H/2-200, rand, sun_dir, 0);
         
@@ -140,49 +229,54 @@ public class PlanetsGfx
         
 //        NebulaStormGalaxyGfx.showImage(im);
     }
-    private static void makePlanetRecur(Graphics2D g2, final int W, final int H,
-            int diameter, int x, int y, Random rand, float[] sun_dir, int level)
+//    private static void makePlanetRecur(Graphics2D g2, final int W, final int H,
+//            int diameter, int x, int y, Random rand, float[] sun_dir, int level)
+//    {
+//        makePlanet(g2, W, H, diameter, x, y, rand, sun_dir);
+//        
+//        if (level > 1)
+//            return;
+//        int numSat = rand.nextInt(3);
+//        ArrayList<Integer> prevAngle = new ArrayList<Integer>();
+//        for (int i = 0; i < numSat; i++)
+//        {
+//            int an = rand.nextInt(8);
+//            while(prevAngle.contains(an))
+//                an = rand.nextInt(8);
+//            
+//            prevAngle.add(an);
+//            
+//            double th = Math.PI * 2 *an / 8;
+//            int satx = (int) (x+(diameter/2) * (1+Math.cos(th))); 
+//            int saty = (int) (y+(diameter/2) * (1+Math.sin(th)));
+//            
+//            int satdia = (int) (diameter * (.2 + rand.nextDouble() * .4));
+//            
+//            makePlanetRecur(g2, W, H, satdia, satx-satdia/2, saty-satdia/2, rand, sun_dir, level+1);
+//        }
+//    }
+
+    private static PlanetType pickPlanet(Args args, Random rand)
     {
-        makePlanet(g2, W, H, diameter, x, y, rand, sun_dir);
-        
-        if (level > 1)
-            return;
-        int numSat = rand.nextInt(3);
-        ArrayList<Integer> prevAngle = new ArrayList<Integer>();
-        for (int i = 0; i < numSat; i++)
-        {
-            int an = rand.nextInt(8);
-            while(prevAngle.contains(an))
-                an = rand.nextInt(8);
-            
-            prevAngle.add(an);
-            
-            double th = Math.PI * 2 *an / 8;
-            int satx = (int) (x+(diameter/2) * (1+Math.cos(th))); 
-            int saty = (int) (y+(diameter/2) * (1+Math.sin(th)));
-            
-            int satdia = (int) (diameter * (.2 + rand.nextDouble() * .4));
-            
-            makePlanetRecur(g2, W, H, satdia, satx-satdia/2, saty-satdia/2, rand, sun_dir, level+1);
-        }
+        return args.pTypes.get(rand.nextInt(args.pTypes.size()));
     }
 
+
     private static Planet makePlanet(Graphics2D g2, final int W, final int H,
-            int diameter, int x, int y, Random rand, float[] sun_dir)
+            int diameter, int x, int y, Random rand, float[] sun_dir,
+            PlanetType type)
     {
         Planet p = null;
         long seed = rand.nextLong();
-        switch (rand.nextInt(5))
+        switch (type)
         {
-        case 0:
-        case 1:
+        case HABIT:
             p = new HabitPlanet(seed);
             break;
-        case 2:
+        case LAVA:
             p = new LavaPlanet(seed);
             break;
-        case 3:
-        case 4:
+        case STORM:
             p = new StormPlanet(seed);
             break;
         }

@@ -58,7 +58,7 @@ public class LavaPlanet extends Planet
         
         double offx = rand.nextDouble() * 256, offy = rand.nextDouble() * 256;  
 
-        NaiveVoronoi v= new NaiveVoronoi(40, rand);
+//        NaiveVoronoi v= new NaiveVoronoi(40, rand);
         
         for (int x = 0; x < SIZE; x++)
         {
