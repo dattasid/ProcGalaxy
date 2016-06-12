@@ -8,7 +8,7 @@ Procedural Colorful Galaxies
 
 [<img src="examples/habit_single6.png" width="100"> Procedural Planets see below](#procplanets)
 
-[Download here!](https://github.com/dattasid/ProcGalaxy/raw/master/binaries/prettygalaxy.v1.jar)
+[Download ProcGalaxy here!](https://github.com/dattasid/ProcGalaxy/raw/master/binaries/prettygalaxy.v1.jar)
 
 Double click the jar to get a random galaxy shown. (Window closes automatically after 20 seconds).
 
@@ -63,7 +63,7 @@ This is how it looks before the swirl:
 <img src="examples/storm_single3.png" width="400">
 <img src="examples/lava_single4.png" width="400">
 
-[Download here!](https://github.com/dattasid/ProcGalaxy/raw/master/binaries/PlanetGfx.v1.jar)
+[Download ProcPlanets here!](https://github.com/dattasid/ProcGalaxy/raw/master/binaries/PlanetGfx.v1.jar)
 
 Procedural planets. Currently three types are implemented.
 
